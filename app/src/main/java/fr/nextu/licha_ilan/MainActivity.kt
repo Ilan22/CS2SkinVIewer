@@ -1,31 +1,33 @@
 package fr.nextu.licha_ilan
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import com.google.android.material.snackbar.Snackbar
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.ui.AppBarConfiguration
-import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.reflect.TypeToken
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.widget.Toolbar
+import androidx.navigation.findNavController
 import fr.nextu.licha_ilan.databinding.ActivityMainBinding
-import fr.nextu.licha_ilan.entity.Skin
-import fr.nextu.licha_ilan.entity.Skins
+import fr.nextu.licha_ilan.entity.AppDatabase
+import fr.nextu.licha_ilan.entity.Settings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    val db: AppDatabase by lazy {
+
+    private val db: AppDatabase by lazy {
         AppDatabase.getInstance(applicationContext)
+    }
+
+    fun getDatabase(): AppDatabase {
+        return db
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,44 +35,72 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        setSupportActionBar(binding.toolbar)
-
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .setAnchorView(R.id.fab).show()
-        }
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
     }
 
-    override fun onStart() {
-        super.onStart()
-        requestSkinsList(::skinsFromJson)
+    @SuppressLint("RestrictedApi")
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        if (menu is MenuBuilder) menu.setOptionalIconsVisible(true)
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
     }
 
-    fun requestSkinsList(callback: (String) -> Unit) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         CoroutineScope(Dispatchers.IO).launch {
+            handleMenuItemClick(item)
+        }
+        return true
+    }
 
-            val client = OkHttpClient()
+    private suspend fun handleMenuItemClick(item: MenuItem) {
+        val currentLanguage = getDatabase().settingsDao().getLanguage() ?: "fr"
+        val newLanguage = when (item.itemId) {
+            R.id.action_french -> "fr"
+            R.id.action_english -> "en"
+            else -> return
+        }
 
-            val request: Request = Request.Builder()
-                .url("https://bymykel.github.io/CSGO-API/api/fr/skins.json")
-                .get()
-                .build()
-
-            val response: Response = client.newCall(request).execute()
-            callback(response.body?.string() ?: "")
+        if (currentLanguage != newLanguage) {
+            updateLanguage(newLanguage)
+        } else {
+            showToast(if (newLanguage == "fr") "Le français est déjà sélectionné !" else "English is already selected !")
         }
     }
 
-    fun skinsFromJson(json: String) {
-        val jsonArray = JSONArray(json)
-        val newJson = JSONObject().apply {
-            put("skins", jsonArray)
+    private suspend fun updateLanguage(language: String) {
+        getDatabase().settingsDao().insertOrUpdate(Settings(1, language))
+        withContext(Dispatchers.Main) {
+            showToast(if (language == "en") "Changing to English..." else "Changement vers le français...")
+            resetData()
         }
-        val gson = Gson()
-        val om = gson.fromJson(newJson.toString(), Skins::class.java)
-        db.skinDao().insertAll(*om.skins.toTypedArray())
-        Log.d("TEEEEESTT", db.skinDao().getAll().toString())
+    }
+
+    private fun showToast(message: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun resetData() {
+        CoroutineScope(Dispatchers.IO).launch {
+            getDatabase().skinDao().deleteAllSkins()
+            getDatabase().skinDao().deleteAllCategories()
+            getDatabase().skinDao().deleteAllRarities()
+        }
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        navController.popBackStack(R.id.categoriesListFragment, false)
+        navController.navigate(R.id.categoriesListFragment)
+    }
+
+    // Réagit à l'intent envoyé au clic de la notification
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        val bundle = Bundle().apply {
+            putString("skin_id", intent.getStringExtra("skin_id"))
+            putString("category_name", intent.getStringExtra("category_name"))
+        }
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        navController.navigate(R.id.skinViewFragment, bundle)
     }
 }
