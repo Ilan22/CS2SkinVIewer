@@ -1,35 +1,66 @@
 package fr.nextu.licha_ilan.entity
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SkinDAO {
-    @Query("SELECT * FROM skin")
-    fun getAll(): List<Skin>
 
-    @Query("SELECT * FROM skin WHERE id IN (:userIds)")
-    fun loadAllByIds(userIds: IntArray): List<Skin>
+    /**
+     * Skin
+     */
+    @RawQuery(observedEntities = [Skin::class])
+    fun getFlowData(sortQuery: SupportSQLiteQuery): Flow<List<Skin>>
 
-//    @Query("SELECT * FROM skin WHERE title LIKE :title LIMIT 1")
-//    fun findByTitle(title: String): Skin
+    @Insert
+    fun insertSkin(skin: Skin): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg skins: Skin)
+    @Query("SELECT * FROM skins WHERE id = :id")
+    fun getSkinById(id: String?): Skin?
 
-    @Delete
-    fun delete(skin: Skin)
+    @Query("SELECT id FROM skins WHERE category_id = :categoryId ORDER BY RANDOM() LIMIT 1")
+    fun getRandomSkinIdByCategory(categoryId: String): String
 
-    @Query("SELECT * FROM skin")
-    fun getFlowData(): Flow<List<Skin>>
+    @Query("DELETE FROM skins")
+    fun deleteAllSkins()
 
-    @Query("SELECT * FROM skin WHERE id = :id")
-    fun get(id: Int): Skin
+    @Query("SELECT COUNT(*) FROM skins")
+    suspend fun countSkins(): Int
 
-    @Query("SELECT * FROM skin WHERE id = :id")
-    fun getFlow(id: Int): Flow<Skin>
+    suspend fun isTableEmpty(): Boolean = countSkins() == 0
+
+    /**
+     * Category
+     */
+    @Query("DELETE FROM categories")
+    fun deleteAllCategories()
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+   fun insertCategory(category: Category): Long
+
+    @Query("SELECT * FROM categories WHERE id = :id")
+    fun getCategoryById(id: String?): Category?
+
+    @Query("SELECT DISTINCT * FROM categories")
+    fun getCategories(): List<Category>
+
+    /**
+     * Rarity
+     */
+    @Query("SELECT * FROM rarities ORDER BY name")
+    fun getAllRarities(): List<Rarity>
+
+    @Query("DELETE FROM rarities")
+    fun deleteAllRarities()
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertRarity(rarity: Rarity): Long
+
+    @Query("SELECT * FROM rarities WHERE name = :name")
+    fun getRarityByName(name: String?): Rarity?
 }

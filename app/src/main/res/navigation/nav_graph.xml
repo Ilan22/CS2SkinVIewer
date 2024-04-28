@@ -3,26 +3,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
-
+    app:startDestination="@id/categoriesListFragment">
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="fr.nextu.licha_ilan.ilan.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
-
+        android:id="@+id/categoriesListFragment"
+        android:name="fr.nextu.licha_ilan.CategoriesListFragment"
+        android:label="fragment_categories_list"
+        tools:layout="@layout/fragment_categories_list" >
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_categoriesListFragment_to_skinsListFragment"
+            app:destination="@id/skinsListFragment" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="fr.nextu.licha_ilan.ilan.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
-
+        android:id="@+id/skinsListFragment"
+        android:name="fr.nextu.licha_ilan.SkinsListFragment"
+        android:label="fragment_skins_list"
+        tools:layout="@layout/fragment_skins_list" >
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_skinsListFragment_to_categoriesListFragment"
+            app:destination="@id/categoriesListFragment" />
+        <argument
+            android:name="category_id"
+            app:argType="string" />
+        <argument
+            android:name="category_name"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_skinsListFragment_to_skinViewFragment"
+            app:destination="@id/skinViewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/skinViewFragment"
+        android:name="fr.nextu.licha_ilan.SkinViewFragment"
+        android:label="fragment_skin_view"
+        tools:layout="@layout/fragment_skin_view" >
+        <action
+            android:id="@+id/action_skinViewFragment_to_skinsListFragment"
+            app:destination="@id/skinsListFragment" />
     </fragment>
 </navigation>

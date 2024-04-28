@@ -1,17 +1,19 @@
 package fr.nextu.licha_ilan.entity
 
+import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "skin")
+@Entity(tableName = "skins")
 data class Skin(
-    @PrimaryKey val id: String,
+    @PrimaryKey @ColumnInfo(name = "id") val id: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "description") val description: String,
     @ColumnInfo(name = "weapon") val weapon: Weapon,
-    @ColumnInfo(name = "category") val category: Category,
-    @ColumnInfo(name = "rarity") val rarity: Rarity,
+    @Embedded(prefix = "category_") val category: Category,
+    @Embedded(prefix = "rarity_") val rarity: Rarity,
     @ColumnInfo(name = "stattrak") val stattrak: Boolean,
     @ColumnInfo(name = "image") val image: String
 )
@@ -20,12 +22,14 @@ data class Weapon(
     val name: String
 )
 
+@Entity(tableName = "categories")
 data class Category(
-    val id: String,
-    val name: String
+    @PrimaryKey @ColumnInfo(name = "id") val id: String,
+    @ColumnInfo(name = "name") val name: String
 )
 
+@Entity(tableName = "rarities")
 data class Rarity(
-    val name: String,
-    val color: String
+    @PrimaryKey @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "color") val color: String
 )

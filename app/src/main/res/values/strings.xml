@@ -1,11 +1,5 @@
 <resources>
     <string name="app_name">CS2SkinViewer</string>
-    <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
@@ -43,4 +37,25 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="skin_image">Skin Image</string>
+    <string name="skin_viewer_desc2">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
+    <string name="skin_viewer_desc1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vestibulum leo non ornare imperdiet. Ut elementum posuere congue. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
+    <string name="skin_viewer_rarity">Lorem</string>
+    <string name="skin_viewer_weapon">Lorem</string>
+    <string name="skin_viewer_name">Lorem Ipsum</string>
+    <string name="fr">FR</string>
+    <string name="en">EN</string>
+    <string name="notification_title_french">Mise à jour de la liste des skins</string>
+    <string name="notification_content_french">La liste des skins a été mise à jour avec la catégorie %s, tapez ici pour découvrir un skin aléatoire.</string>
+    <string name="notification_title_english">Updating the skin list</string>
+    <string name="notification_content_english">The skin list has been updated with the %s category, tap here to discover a random skin.</string>
+    <string name="more_button">More button</string>
+    <string name="filters_french">Filtres</string>
+    <string name="filters_english">Filters</string>
+    <string name="rarity_french">Rareté :</string>
+    <string name="rarity_english">Rarity :</string>
+    <string name="name_french">Nom :</string>
+    <string name="name_english">Name :</string>
+    <string name="rotate_phone_french">Tournez votre appareil pour activer le mode plein écran.</string>
+    <string name="rotate_phone_english">Rotate your device to enable fullscreen mode</string>
 </resources>
